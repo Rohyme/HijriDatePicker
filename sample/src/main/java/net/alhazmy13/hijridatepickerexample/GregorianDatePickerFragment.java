@@ -1,6 +1,5 @@
 package net.alhazmy13.hijridatepickerexample;
 
-import android.app.Fragment;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,6 +10,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 
+import androidx.fragment.app.Fragment;
 
 import net.alhazmy13.hijridatepicker.date.gregorian.GregorianDatePickerDialog;
 
@@ -98,7 +98,7 @@ public class GregorianDatePickerFragment extends Fragment implements GregorianDa
                 }
                 //Change the language to any of supported language
                 dpd.setLocale(new Locale("ar"));
-                dpd.show(getFragmentManager(), "Datepickerdialog");
+                dpd.show(getChildFragmentManager(), "Datepickerdialog");
             }
         });
 
@@ -108,7 +108,7 @@ public class GregorianDatePickerFragment extends Fragment implements GregorianDa
     @Override
     public void onResume() {
         super.onResume();
-        GregorianDatePickerDialog dpd = (GregorianDatePickerDialog) getFragmentManager().findFragmentByTag("Datepickerdialog");
+        GregorianDatePickerDialog dpd = (GregorianDatePickerDialog) getChildFragmentManager().findFragmentByTag("Datepickerdialog");
         if(dpd != null) dpd.setOnDateSetListener(this);
     }
 

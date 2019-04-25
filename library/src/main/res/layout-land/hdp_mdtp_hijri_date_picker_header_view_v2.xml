@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
      Copyright (C) 2016 Wouter Dullaert
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,11 +18,11 @@
     android:id="@+id/mdtp_hijri_date_picker_header"
     android:layout_width="@dimen/mdtp_date_picker_title_height"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/mdtp_date_picker_title_padding"
     android:gravity="bottom|center"
+    android:importantForAccessibility="no"
     android:includeFontPadding="false"
+    android:maxLines="1"
+    android:paddingTop="@dimen/mdtp_date_picker_title_padding"
     android:textColor="@color/mdtp_white"
     android:textSize="@dimen/mdtp_date_picker_header_text_size"
-    android:maxLines="1"
-    android:importantForAccessibility="no"
     tools:text="Dialog Title" />

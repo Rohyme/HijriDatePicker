@@ -20,11 +20,12 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.graphics.Paint.Align;
-import android.support.v4.content.ContextCompat;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.View;
+
+import androidx.core.content.ContextCompat;
 
 import net.alhazmy13.hijridatepicker.R;
 import net.alhazmy13.hijridatepicker.Utils;
@@ -41,7 +42,8 @@ public class AmPmCirclesView extends View {
     // Alpha level for selected circle.
     private static final int SELECTED_ALPHA = Utils.SELECTED_ALPHA;
     private static final int SELECTED_ALPHA_THEME_DARK = Utils.SELECTED_ALPHA_THEME_DARK;
-
+    private static final int AM = TimePickerDialog.AM;
+    private static final int PM = TimePickerDialog.PM;
     private final Paint mPaint = new Paint();
     private int mSelectedAlpha;
     private int mTouchedColor;
@@ -57,10 +59,6 @@ public class AmPmCirclesView extends View {
     private boolean mAmDisabled;
     private boolean mPmDisabled;
     private boolean mIsInitialized;
-
-    private static final int AM = TimePickerDialog.AM;
-    private static final int PM = TimePickerDialog.PM;
-
     private boolean mDrawValuesReady;
     private int mAmPmCircleRadius;
     private int mAmXCenter;

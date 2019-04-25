@@ -19,7 +19,6 @@ package net.alhazmy13.hijridatepicker.time;
 import android.animation.ObjectAnimator;
 import android.app.ActionBar.LayoutParams;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
@@ -27,12 +26,6 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -45,6 +38,14 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 
 import net.alhazmy13.hijridatepicker.HapticFeedbackController;
 import net.alhazmy13.hijridatepicker.R;
@@ -63,13 +64,12 @@ import java.util.Locale;
  */
 public class TimePickerDialog extends DialogFragment implements
         OnValueSelectedListener, TimePickerController {
+    static final int HOUR_INDEX = 0;
+    static final int MINUTE_INDEX = 1;
+    static final int SECOND_INDEX = 2;
+    static final int AM = 0;
+    static final int PM = 1;
     private static final String TAG = "TimePickerDialog";
-
-    public enum Version {
-        VERSION_1,
-        VERSION_2
-    }
-
     private static final String KEY_INITIAL_TIME = "initial_time";
     private static final String KEY_IS_24_HOUR_VIEW = "is_24_hour_view";
     private static final String KEY_TITLE = "dialog_title";
@@ -94,22 +94,12 @@ public class TimePickerDialog extends DialogFragment implements
     private static final String KEY_CANCEL_COLOR = "cancel_color";
     private static final String KEY_VERSION = "version";
     private static final String KEY_LOCALE = "locale";
-
-    public static final int HOUR_INDEX = 0;
-    public static final int MINUTE_INDEX = 1;
-    public static final int SECOND_INDEX = 2;
-    public static final int AM = 0;
-    public static final int PM = 1;
-
     // Delay before starting the pulse animation, in ms.
     private static final int PULSE_ANIMATOR_DELAY = 300;
-
     private OnTimeSetListener mCallback;
     private DialogInterface.OnCancelListener mOnCancelListener;
     private DialogInterface.OnDismissListener mOnDismissListener;
-
     private HapticFeedbackController mHapticFeedbackController;
-
     private Button mCancelButton;
     private Button mOkButton;
     private TextView mHourView;
@@ -122,12 +112,10 @@ public class TimePickerDialog extends DialogFragment implements
     private TextView mPmTextView;
     private View mAmPmLayout;
     private RadialPickerLayout mTimePicker;
-
     private int mSelectedColor;
     private int mUnselectedColor;
     private String mAmText;
     private String mPmText;
-
     private boolean mAllowAutoAdvance;
     private Timepoint mInitialTime;
     private boolean mIs24HourMode;
@@ -149,7 +137,6 @@ public class TimePickerDialog extends DialogFragment implements
     private String mCancelString;
     private int mCancelColor;
     private Version mVersion;
-
     // For hardware IME input.
     private char mPlaceholderText;
     private String mDoublePlaceholderText;
@@ -159,9 +146,7 @@ public class TimePickerDialog extends DialogFragment implements
     private Node mLegalTimesTree;
     private int mAmKeyCode;
     private int mPmKeyCode;
-
     private Locale mLocale = Locale.getDefault();
-
     // Accessibility strings.
     private String mHourPickerDescription;
     private String mSelectHours;
@@ -169,21 +154,6 @@ public class TimePickerDialog extends DialogFragment implements
     private String mSelectMinutes;
     private String mSecondPickerDescription;
     private String mSelectSeconds;
-
-    /**
-     * The callback interface used to indicate the user is done filling in
-     * the time (they clicked on the 'Set' button).
-     */
-    public interface OnTimeSetListener {
-
-        /**
-         * @param view      The view associated with this listener.
-         * @param hourOfDay The hour that was set.
-         * @param minute    The minute that was set.
-         * @param second    The second that was set
-         */
-        void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second);
-    }
 
     public TimePickerDialog() {
         // Empty constructor required for dialog fragment.
@@ -199,6 +169,33 @@ public class TimePickerDialog extends DialogFragment implements
     public static TimePickerDialog newInstance(OnTimeSetListener callback,
                                                int hourOfDay, int minute, boolean is24HourMode) {
         return TimePickerDialog.newInstance(callback, hourOfDay, minute, 0, is24HourMode);
+    }
+
+    private static int getValFromKeyCode(int keyCode) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_0:
+                return 0;
+            case KeyEvent.KEYCODE_1:
+                return 1;
+            case KeyEvent.KEYCODE_2:
+                return 2;
+            case KeyEvent.KEYCODE_3:
+                return 3;
+            case KeyEvent.KEYCODE_4:
+                return 4;
+            case KeyEvent.KEYCODE_5:
+                return 5;
+            case KeyEvent.KEYCODE_6:
+                return 6;
+            case KeyEvent.KEYCODE_7:
+                return 7;
+            case KeyEvent.KEYCODE_8:
+                return 8;
+            case KeyEvent.KEYCODE_9:
+                return 9;
+            default:
+                return -1;
+        }
     }
 
     public void initialize(OnTimeSetListener callback,
@@ -223,42 +220,15 @@ public class TimePickerDialog extends DialogFragment implements
         mVersion = Build.VERSION.SDK_INT < Build.VERSION_CODES.M ? Version.VERSION_1 : Version.VERSION_2;
     }
 
-    /**
-     * Set a title. NOTE: this will only take effect with the next onCreateView
-     */
-    public void setTitle(String title) {
-        mTitle = title;
-    }
-
     public String getTitle() {
         return mTitle;
     }
 
     /**
-     * Set a dark or light theme. NOTE: this will only take effect for the next onCreateView.
+     * Set a title. NOTE: this will only take effect with the next onCreateView
      */
-    public void setThemeDark(boolean dark) {
-        mThemeDark = dark;
-        mThemeDarkChanged = true;
-    }
-
-    /**
-     * Set the accent color of this dialog
-     *
-     * @param color the accent color you want
-     */
-    @SuppressWarnings("unused")
-    public void setAccentColor(String color) {
-        mAccentColor = Color.parseColor(color);
-    }
-
-    /**
-     * Set the accent color of this dialog
-     *
-     * @param color the accent color you want
-     */
-    public void setAccentColor(@ColorInt int color) {
-        mAccentColor = Color.argb(255, Color.red(color), Color.green(color), Color.blue(color));
+    public void setTitle(String title) {
+        mTitle = title;
     }
 
     /**
@@ -306,6 +276,14 @@ public class TimePickerDialog extends DialogFragment implements
         return mThemeDark;
     }
 
+    /**
+     * Set a dark or light theme. NOTE: this will only take effect for the next onCreateView.
+     */
+    public void setThemeDark(boolean dark) {
+        mThemeDark = dark;
+        mThemeDarkChanged = true;
+    }
+
     @Override
     public boolean is24HourMode() {
         return mIs24HourMode;
@@ -314,6 +292,25 @@ public class TimePickerDialog extends DialogFragment implements
     @Override
     public int getAccentColor() {
         return mAccentColor;
+    }
+
+    /**
+     * Set the accent color of this dialog
+     *
+     * @param color the accent color you want
+     */
+    @SuppressWarnings("unused")
+    public void setAccentColor(String color) {
+        mAccentColor = Color.parseColor(color);
+    }
+
+    /**
+     * Set the accent color of this dialog
+     *
+     * @param color the accent color you want
+     */
+    public void setAccentColor(@ColorInt int color) {
+        mAccentColor = Color.argb(255, Color.red(color), Color.green(color), Color.blue(color));
     }
 
     /**
@@ -509,6 +506,11 @@ public class TimePickerDialog extends DialogFragment implements
         mCancelResid = cancelResid;
     }
 
+    @Override
+    public Version getVersion() {
+        return mVersion;
+    }
+
     /**
      * Set which layout version the picker should use
      *
@@ -516,11 +518,6 @@ public class TimePickerDialog extends DialogFragment implements
      */
     public void setVersion(Version version) {
         mVersion = version;
-    }
-
-    @Override
-    public Version getVersion() {
-        return mVersion;
     }
 
     @Override
@@ -1490,33 +1487,6 @@ public class TimePickerDialog extends DialogFragment implements
         }
     }
 
-    private static int getValFromKeyCode(int keyCode) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_0:
-                return 0;
-            case KeyEvent.KEYCODE_1:
-                return 1;
-            case KeyEvent.KEYCODE_2:
-                return 2;
-            case KeyEvent.KEYCODE_3:
-                return 3;
-            case KeyEvent.KEYCODE_4:
-                return 4;
-            case KeyEvent.KEYCODE_5:
-                return 5;
-            case KeyEvent.KEYCODE_6:
-                return 6;
-            case KeyEvent.KEYCODE_7:
-                return 7;
-            case KeyEvent.KEYCODE_8:
-                return 8;
-            case KeyEvent.KEYCODE_9:
-                return 9;
-            default:
-                return -1;
-        }
-    }
-
     /**
      * Get the currently-entered time, as integer values of the hours, minutes and seconds typed.
      *
@@ -1838,6 +1808,36 @@ public class TimePickerDialog extends DialogFragment implements
         }
     }
 
+    public void notifyOnDateListener() {
+        if (mCallback != null) {
+            mCallback.onTimeSet(this, mTimePicker.getHours(), mTimePicker.getMinutes(), mTimePicker.getSeconds());
+        }
+    }
+
+    public Timepoint getSelectedTime() {
+        return mTimePicker.getTime();
+    }
+
+    public enum Version {
+        VERSION_1,
+        VERSION_2
+    }
+
+    /**
+     * The callback interface used to indicate the user is done filling in
+     * the time (they clicked on the 'Set' button).
+     */
+    public interface OnTimeSetListener {
+
+        /**
+         * @param view      The view associated with this listener.
+         * @param hourOfDay The hour that was set.
+         * @param minute    The minute that was set.
+         * @param second    The second that was set
+         */
+        void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second);
+    }
+
     /**
      * Simple node class to be used for traversal to check for legal times.
      * mLegalKeys represents the keys that can be typed to get to the node.
@@ -1884,15 +1884,5 @@ public class TimePickerDialog extends DialogFragment implements
             }
             return false;
         }
-    }
-
-    public void notifyOnDateListener() {
-        if (mCallback != null) {
-            mCallback.onTimeSet(this, mTimePicker.getHours(), mTimePicker.getMinutes(), mTimePicker.getSeconds());
-        }
-    }
-
-    public Timepoint getSelectedTime() {
-        return mTimePicker.getTime();
     }
 }

@@ -26,17 +26,18 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
-import android.support.v4.widget.ExploreByTouchHelper;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
+import androidx.customview.widget.ExploreByTouchHelper;
 
 import net.alhazmy13.hijridatepicker.R;
 import net.alhazmy13.hijridatepicker.TypefaceHelper;
@@ -55,17 +56,16 @@ import java.util.Locale;
  * within the specified month.
  */
 public abstract class MonthView extends View {
-    private static final String TAG = "MonthView";
+    /**
+     * This sets the height of this week in pixels
+     */
+    public static final String VIEW_PARAMS_HEIGHT = "height";
 
     /**
      * These params can be passed into the view to control how it appears.
      * {@link #VIEW_PARAMS_WEEK} is the only required field, though the default
      * values are unlikely to fit most layouts correctly.
      */
-    /**
-     * This sets the height of this week in pixels
-     */
-    public static final String VIEW_PARAMS_HEIGHT = "height";
     /**
      * This specifies the position (or weeks since the epoch) of this week.
      */
@@ -98,9 +98,6 @@ public abstract class MonthView extends View {
      * If this month should display week numbers. false if 0, true otherwise.
      */
     public static final String VIEW_PARAMS_SHOW_WK_NUM = "show_wk_num";
-
-    protected static int DEFAULT_HEIGHT = 32;
-    protected static int MIN_HEIGHT = 10;
     protected static final int DEFAULT_SELECTED_DAY = -1;
     protected static final int DEFAULT_WEEK_START = Calendar.SUNDAY;
     protected static final int DEFAULT_NUM_DAYS = 7;
@@ -108,9 +105,10 @@ public abstract class MonthView extends View {
     protected static final int DEFAULT_FOCUS_MONTH = -1;
     protected static final int DEFAULT_NUM_ROWS = 6;
     protected static final int MAX_NUM_ROWS = 6;
-
+    private static final String TAG = "MonthView";
     private static final int SELECTED_CIRCLE_ALPHA = 255;
-
+    protected static int DEFAULT_HEIGHT = 32;
+    protected static int MIN_HEIGHT = 10;
     protected static int DAY_SEPARATOR_WIDTH = 1;
     protected static int MINI_DAY_NUMBER_TEXT_SIZE;
     protected static int MONTH_LABEL_TEXT_SIZE;
@@ -120,32 +118,25 @@ public abstract class MonthView extends View {
 
     // used for scaling to the device density
     protected static float mScale = 0;
-
+    protected final Calendar mDayLabelCalendar;
+    private final Formatter mFormatter;
+    private final StringBuilder mStringBuilder;
+    private final Calendar mCalendar;
+    private final MonthViewTouchHelper mTouchHelper;
     protected DatePickerController mController;
-
     // affects the padding on the sides of this view
     protected int mEdgePadding = 0;
-
-    private String mDayOfWeekTypeface;
-    private String mMonthTitleTypeface;
-
     protected Paint mMonthNumPaint;
     protected Paint mMonthTitlePaint;
     protected Paint mSelectedCirclePaint;
     protected Paint mMonthDayLabelPaint;
-
-    private final Formatter mFormatter;
-    private final StringBuilder mStringBuilder;
-
     // The Julian day of the first day displayed by this item
     protected int mFirstJulianDay = -1;
     // The month of the first day in this week
     protected int mFirstMonth = -1;
     // The month of the last day in this week
     protected int mLastMonth = -1;
-
     protected int mMonth;
-
     protected int mYear;
     // Quick reference to the width of this view, matches parent
     protected int mWidth;
@@ -167,19 +158,9 @@ public abstract class MonthView extends View {
     protected int mSelectedLeft = -1;
     // The right edge of the selected day
     protected int mSelectedRight = -1;
-
-    private final Calendar mCalendar;
-    protected final Calendar mDayLabelCalendar;
-    private final MonthViewTouchHelper mTouchHelper;
-
     protected int mNumRows = DEFAULT_NUM_ROWS;
-
     // Optional listener for handling day click actions
     protected OnDayClickListener mOnDayClickListener;
-
-    // Whether to prevent setting the accessibility delegate
-    private boolean mLockAccessibilityDelegate;
-
     protected int mDayTextColor;
     protected int mSelectedDayTextColor;
     protected int mMonthDayTextColor;
@@ -187,6 +168,11 @@ public abstract class MonthView extends View {
     protected int mHighlightedDayTextColor;
     protected int mDisabledDayTextColor;
     protected int mMonthTitleColor;
+    private String mDayOfWeekTypeface;
+    private String mMonthTitleTypeface;
+    // Whether to prevent setting the accessibility delegate
+    private boolean mLockAccessibilityDelegate;
+    private int mDayOfWeekStart = 0;
 
     public MonthView(Context context) {
         this(context, null, null);
@@ -333,8 +319,6 @@ public abstract class MonthView extends View {
         drawMonthDayLabels(canvas);
         drawMonthNums(canvas);
     }
-
-    private int mDayOfWeekStart = 0;
 
     /**
      * Sets all the parameters for displaying this week. The only required
@@ -690,6 +674,13 @@ public abstract class MonthView extends View {
     }
 
     /**
+     * Handles callbacks when the user clicks on a time object.
+     */
+    public interface OnDayClickListener {
+        void onDayClick(MonthView view, CalendarDay day);
+    }
+
+    /**
      * Provides a virtual view hierarchy for interfacing with an accessibility
      * service.
      */
@@ -805,12 +796,5 @@ public abstract class MonthView extends View {
 
             return date;
         }
-    }
-
-    /**
-     * Handles callbacks when the user clicks on a time object.
-     */
-    public interface OnDayClickListener {
-        void onDayClick(MonthView view, CalendarDay day);
     }
 }

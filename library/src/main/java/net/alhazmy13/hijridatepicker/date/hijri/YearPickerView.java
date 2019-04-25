@@ -28,9 +28,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import net.alhazmy13.hijridatepicker.date.hijri.HijriDatePickerDialog.OnDateChangedListener;
 
 import net.alhazmy13.hijridatepicker.R;
+import net.alhazmy13.hijridatepicker.date.hijri.HijriDatePickerDialog.OnDateChangedListener;
 
 /**
  * Displays a selectable list of years.
@@ -63,6 +63,10 @@ public class YearPickerView extends ListView implements OnItemClickListener, OnD
         onDateChanged();
     }
 
+    private static int getYearFromTextView(TextView view) {
+        return Integer.valueOf(view.getText().toString());
+    }
+
     private void init() {
         mAdapter = new YearAdapter(mController.getMinYear(), mController.getMaxYear());
         setAdapter(mAdapter);
@@ -84,59 +88,6 @@ public class YearPickerView extends ListView implements OnItemClickListener, OnD
             }
             mController.onYearSelected(getYearFromTextView(clickedView));
             mAdapter.notifyDataSetChanged();
-        }
-    }
-
-    private static int getYearFromTextView(TextView view) {
-        return Integer.valueOf(view.getText().toString());
-    }
-
-    private final class YearAdapter extends BaseAdapter {
-        private final int mMinYear;
-        private final int mMaxYear;
-
-        YearAdapter(int minYear, int maxYear) {
-            if (minYear > maxYear) {
-                throw new IllegalArgumentException("minYear > maxYear");
-            }
-            mMinYear = minYear;
-            mMaxYear = maxYear;
-        }
-
-        @Override
-        public int getCount() {
-            return mMaxYear - mMinYear + 1;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mMinYear + position;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TextViewWithCircularIndicator v;
-            if (convertView != null) {
-                v = (TextViewWithCircularIndicator) convertView;
-            } else {
-                v = (TextViewWithCircularIndicator) LayoutInflater.from(parent.getContext())
-                  .inflate(R.layout.hdp_mdtp_hijri_year_label_text_view, parent, false);
-                v.setAccentColor(mController.getAccentColor(), mController.isThemeDark());
-            }
-            int year = mMinYear + position;
-            boolean selected = mController.getSelectedDay().year == year;
-            v.setText(String.format(mController.getLocale(),"%d", year));
-            v.drawIndicator(selected);
-            v.requestLayout();
-            if (selected) {
-                mSelectedView = v;
-            }
-            return v;
         }
     }
 
@@ -175,6 +126,55 @@ public class YearPickerView extends ListView implements OnItemClickListener, OnD
         if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
             event.setFromIndex(0);
             event.setToIndex(0);
+        }
+    }
+
+    private final class YearAdapter extends BaseAdapter {
+        private final int mMinYear;
+        private final int mMaxYear;
+
+        YearAdapter(int minYear, int maxYear) {
+            if (minYear > maxYear) {
+                throw new IllegalArgumentException("minYear > maxYear");
+            }
+            mMinYear = minYear;
+            mMaxYear = maxYear;
+        }
+
+        @Override
+        public int getCount() {
+            return mMaxYear - mMinYear + 1;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mMinYear + position;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            TextViewWithCircularIndicator v;
+            if (convertView != null) {
+                v = (TextViewWithCircularIndicator) convertView;
+            } else {
+                v = (TextViewWithCircularIndicator) LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.hdp_mdtp_hijri_year_label_text_view, parent, false);
+                v.setAccentColor(mController.getAccentColor(), mController.isThemeDark());
+            }
+            int year = mMinYear + position;
+            boolean selected = mController.getSelectedDay().year == year;
+            v.setText(String.format(mController.getLocale(), "%d", year));
+            v.drawIndicator(selected);
+            v.requestLayout();
+            if (selected) {
+                mSelectedView = v;
+            }
+            return v;
         }
     }
 }

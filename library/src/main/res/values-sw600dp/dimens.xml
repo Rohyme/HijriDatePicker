@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
 ** Copyright 2013, The Android Open Source Project
 **
@@ -32,8 +31,8 @@
     <dimen name="mdtp_selected_date_month_size">45dp</dimen>
     <dimen name="mdtp_year_label_height">96dp</dimen>
     <dimen name="mdtp_year_label_text_size">33dp</dimen>
-    <dimen name="mdtp_date_picker_header_text_size">18dp</dimen>
-    <dimen name="mdtp_time_picker_header_text_size">18dp</dimen>
+    <dimen name="mdtp_date_picker_header_text_size">18sp</dimen>
+    <dimen name="mdtp_time_picker_header_text_size">18sp</dimen>
 
     <dimen name="mdtp_month_list_item_size">18sp</dimen>
     <dimen name="mdtp_month_label_size">16sp</dimen>

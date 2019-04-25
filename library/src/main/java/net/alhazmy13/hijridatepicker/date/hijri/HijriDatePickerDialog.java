@@ -19,17 +19,12 @@ package net.alhazmy13.hijridatepicker.date.hijri;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
-import android.support.v4.content.ContextCompat;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -43,6 +38,12 @@ import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 
 import com.github.msarhan.ummalqura.calendar.UmmalquraCalendar;
 
@@ -65,16 +66,9 @@ import java.util.TreeSet;
 public class HijriDatePickerDialog extends DialogFragment implements
         OnClickListener, DatePickerController {
     private static final String TAG = "GregorianDatePickerDialog";
-
-    public enum Version {
-        VERSION_1,
-        VERSION_2
-    }
-
     private static final int UNINITIALIZED = -1;
     private static final int MONTH_AND_DAY_VIEW = 0;
     private static final int YEAR_VIEW = 1;
-
     private static final String KEY_SELECTED_YEAR = "year";
     private static final String KEY_SELECTED_MONTH = "month";
     private static final String KEY_SELECTED_DAY = "day";
@@ -105,27 +99,20 @@ public class HijriDatePickerDialog extends DialogFragment implements
     private static final String KEY_CANCEL_COLOR = "cancel_color";
     private static final String KEY_VERSION = "version";
     private static final String KEY_TIMEZONE = "timezone";
-
-
     private static final int DEFAULT_START_YEAR = 1400;
     private static final int DEFAULT_END_YEAR = 1450;
-
     private static final int ANIMATION_DURATION = 300;
     private static final int ANIMATION_DELAY = 500;
-
+    public static Locale mLocale = Locale.getDefault();
     private static SimpleDateFormat YEAR_FORMAT = new SimpleDateFormat("y", Locale.getDefault());
     private static SimpleDateFormat MONTH_FORMAT = new SimpleDateFormat("MMMM", Locale.getDefault());
     private static SimpleDateFormat DAY_FORMAT = new SimpleDateFormat("dd", Locale.getDefault());
     private static SimpleDateFormat VERSION_2_FORMAT;
-
-    private final UmmalquraCalendar mCalendar = trimToMidnight(new UmmalquraCalendar(getTimeZone(), Locale.getDefault()));
     private OnDateSetListener mCallBack;
     private HashSet<OnDateChangedListener> mListeners = new HashSet<>();
     private DialogInterface.OnCancelListener mOnCancelListener;
     private DialogInterface.OnDismissListener mOnDismissListener;
-
     private AccessibleDateAnimator mAnimator;
-
     private TextView mDatePickerHeaderView;
     private LinearLayout mMonthAndDayView;
     private TextView mSelectedMonthTextView;
@@ -133,10 +120,7 @@ public class HijriDatePickerDialog extends DialogFragment implements
     private TextView mYearView;
     private DayPickerView mDayPickerView;
     private YearPickerView mYearPickerView;
-
     private int mCurrentView = UNINITIALIZED;
-
-    private int mWeekStart = mCalendar.getFirstDayOfWeek();
     private int mMinYear = DEFAULT_START_YEAR;
     private int mMaxYear = DEFAULT_END_YEAR;
     private String mTitle;
@@ -160,41 +144,15 @@ public class HijriDatePickerDialog extends DialogFragment implements
     private int mCancelColor = -1;
     private Version mVersion;
     private TimeZone mTimezone;
-    public static Locale mLocale = Locale.getDefault();
-
+    private final UmmalquraCalendar mCalendar = trimToMidnight(new UmmalquraCalendar(getTimeZone(), Locale.getDefault()));
+    private int mWeekStart = mCalendar.getFirstDayOfWeek();
     private HapticFeedbackController mHapticFeedbackController;
-
     private boolean mDelayAnimation = true;
-
     // Accessibility strings.
     private String mDayPickerDescription;
     private String mSelectDay;
     private String mYearPickerDescription;
     private String mSelectYear;
-
-    /**
-     * The callback used to indicate the user is done filling in the date.
-     */
-    public interface OnDateSetListener {
-
-        /**
-         * @param view        The view associated with this listener.
-         * @param year        The year that was set.
-         * @param monthOfYear The month that was set (0-11) for compatibility
-         *                    with {@link UmmalquraCalendar}.
-         * @param dayOfMonth  The day of the month that was set.
-         */
-        void onDateSet(HijriDatePickerDialog view, int year, int monthOfYear, int dayOfMonth);
-    }
-
-    /**
-     * The callback used to notify other date picker components of a change in selected date.
-     */
-    interface OnDateChangedListener {
-
-        void onDateChanged();
-    }
-
 
     public HijriDatePickerDialog() {
         // Empty constructor required for dialog fragment.
@@ -325,12 +283,12 @@ public class HijriDatePickerDialog extends DialogFragment implements
         // All options have been set at this point: round the initial selection if necessary
         setToNearestDate(mCalendar);
 
-        mDatePickerHeaderView = (TextView) view.findViewById(R.id.mdtp_hijri_date_picker_header);
-        mMonthAndDayView = (LinearLayout) view.findViewById(R.id.mdtp_hijri_date_picker_month_and_day);
+        mDatePickerHeaderView = view.findViewById(R.id.mdtp_hijri_date_picker_header);
+        mMonthAndDayView = view.findViewById(R.id.mdtp_hijri_date_picker_month_and_day);
         mMonthAndDayView.setOnClickListener(this);
-        mSelectedMonthTextView = (TextView) view.findViewById(R.id.mdtp_hijri_date_picker_month);
-        mSelectedDayTextView = (TextView) view.findViewById(R.id.mdtp_hijri_date_picker_day);
-        mYearView = (TextView) view.findViewById(R.id.mdtp_hijri_date_picker_year);
+        mSelectedMonthTextView = view.findViewById(R.id.mdtp_hijri_date_picker_month);
+        mSelectedDayTextView = view.findViewById(R.id.mdtp_hijri_date_picker_day);
+        mYearView = view.findViewById(R.id.mdtp_hijri_date_picker_year);
         mYearView.setOnClickListener(this);
 
         final Activity activity = getActivity();
@@ -351,7 +309,7 @@ public class HijriDatePickerDialog extends DialogFragment implements
         int bgColorResource = mThemeDark ? R.color.mdtp_date_picker_view_animator_dark_theme : R.color.mdtp_date_picker_view_animator;
         view.setBackgroundColor(ContextCompat.getColor(activity, bgColorResource));
 
-        mAnimator = (AccessibleDateAnimator) view.findViewById(R.id.mdtp_hijri_animator);
+        mAnimator = view.findViewById(R.id.mdtp_hijri_animator);
         mAnimator.addView(mDayPickerView);
         mAnimator.addView(mYearPickerView);
         mAnimator.setDateMillis(mCalendar.getTimeInMillis());
@@ -604,16 +562,6 @@ public class HijriDatePickerDialog extends DialogFragment implements
     }
 
     /**
-     * Set whether the dark theme should be used
-     *
-     * @param themeDark true if the dark theme should be used, false if the default theme should be used
-     */
-    public void setThemeDark(boolean themeDark) {
-        mThemeDark = themeDark;
-        mThemeDarkChanged = true;
-    }
-
-    /**
      * Returns true when the dark theme should be used
      *
      * @return true if the dark theme should be used, false if the default theme should be used
@@ -624,22 +572,13 @@ public class HijriDatePickerDialog extends DialogFragment implements
     }
 
     /**
-     * Set the accent color of this dialog
+     * Set whether the dark theme should be used
      *
-     * @param color the accent color you want
+     * @param themeDark true if the dark theme should be used, false if the default theme should be used
      */
-    @SuppressWarnings("unused")
-    public void setAccentColor(String color) {
-        mAccentColor = Color.parseColor(color);
-    }
-
-    /**
-     * Set the accent color of this dialog
-     *
-     * @param color the accent color you want
-     */
-    public void setAccentColor(@ColorInt int color) {
-        mAccentColor = Color.argb(255, Color.red(color), Color.green(color), Color.blue(color));
+    public void setThemeDark(boolean themeDark) {
+        mThemeDark = themeDark;
+        mThemeDarkChanged = true;
     }
 
     /**
@@ -693,24 +632,31 @@ public class HijriDatePickerDialog extends DialogFragment implements
     }
 
     /**
+     * Set the accent color of this dialog
+     *
+     * @param color the accent color you want
+     */
+    @SuppressWarnings("unused")
+    public void setAccentColor(String color) {
+        mAccentColor = Color.parseColor(color);
+    }
+
+    /**
+     * Set the accent color of this dialog
+     *
+     * @param color the accent color you want
+     */
+    public void setAccentColor(@ColorInt int color) {
+        mAccentColor = Color.argb(255, Color.red(color), Color.green(color), Color.blue(color));
+    }
+
+    /**
      * Set whether the year picker of the month and day picker is shown first
      *
      * @param yearPicker boolean
      */
     public void showYearPickerFirst(boolean yearPicker) {
         mDefaultView = yearPicker ? YEAR_VIEW : MONTH_AND_DAY_VIEW;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFirstDayOfWeek(int startOfWeek) {
-        if (startOfWeek < UmmalquraCalendar.SUNDAY || startOfWeek > UmmalquraCalendar.SATURDAY) {
-            throw new IllegalArgumentException("Value must be between Calendar.SUNDAY and " +
-                    "Calendar.SATURDAY");
-        }
-        mWeekStart = startOfWeek;
-        if (mDayPickerView != null) {
-            mDayPickerView.onChange();
-        }
     }
 
     @SuppressWarnings("unused")
@@ -724,6 +670,14 @@ public class HijriDatePickerDialog extends DialogFragment implements
         if (mDayPickerView != null) {
             mDayPickerView.onChange();
         }
+    }
+
+    /**
+     * @return The minimal date supported by this DatePicker. Null if it has not been set.
+     */
+    @SuppressWarnings("unused")
+    public UmmalquraCalendar getMinDate() {
+        return mMinDate;
     }
 
     /**
@@ -742,11 +696,11 @@ public class HijriDatePickerDialog extends DialogFragment implements
     }
 
     /**
-     * @return The minimal date supported by this DatePicker. Null if it has not been set.
+     * @return The maximal date supported by this DatePicker. Null if it has not been set.
      */
     @SuppressWarnings("unused")
-    public UmmalquraCalendar getMinDate() {
-        return mMinDate;
+    public UmmalquraCalendar getMaxDate() {
+        return mMaxDate;
     }
 
     /**
@@ -765,11 +719,14 @@ public class HijriDatePickerDialog extends DialogFragment implements
     }
 
     /**
-     * @return The maximal date supported by this DatePicker. Null if it has not been set.
+     * @return The list of dates, as Calendar Objects, which should be highlighted. null is no dates should be highlighted
      */
     @SuppressWarnings("unused")
-    public UmmalquraCalendar getMaxDate() {
-        return mMaxDate;
+    public UmmalquraCalendar[] getHighlightedDays() {
+        if (highlightedDays.isEmpty()) return null;
+        UmmalquraCalendar[] output = highlightedDays.toArray(new UmmalquraCalendar[0]);
+        Arrays.sort(output);
+        return output;
     }
 
     /**
@@ -784,17 +741,6 @@ public class HijriDatePickerDialog extends DialogFragment implements
         if (mDayPickerView != null) mDayPickerView.onChange();
     }
 
-    /**
-     * @return The list of dates, as Calendar Objects, which should be highlighted. null is no dates should be highlighted
-     */
-    @SuppressWarnings("unused")
-    public UmmalquraCalendar[] getHighlightedDays() {
-        if (highlightedDays.isEmpty()) return null;
-        UmmalquraCalendar[] output = highlightedDays.toArray(new UmmalquraCalendar[0]);
-        Arrays.sort(output);
-        return output;
-    }
-
     @Override
     public boolean isHighlighted(int year, int month, int day) {
         UmmalquraCalendar date = new UmmalquraCalendar();
@@ -803,6 +749,14 @@ public class HijriDatePickerDialog extends DialogFragment implements
         date.set(UmmalquraCalendar.DAY_OF_MONTH, day);
         trimToMidnight(date);
         return highlightedDays.contains(date);
+    }
+
+    /**
+     * @return an Array of Calendar objects containing the list with selectable items. null if no restriction is set
+     */
+    @SuppressWarnings("unused")
+    public UmmalquraCalendar[] getSelectableDays() {
+        return selectableDays.isEmpty() ? null : selectableDays.toArray(new UmmalquraCalendar[0]);
     }
 
     /**
@@ -819,11 +773,14 @@ public class HijriDatePickerDialog extends DialogFragment implements
     }
 
     /**
-     * @return an Array of Calendar objects containing the list with selectable items. null if no restriction is set
+     * @return an Array of Calendar objects containing the list of days that are not selectable. null if no restriction is set
      */
     @SuppressWarnings("unused")
-    public UmmalquraCalendar[] getSelectableDays() {
-        return selectableDays.isEmpty() ? null : selectableDays.toArray(new UmmalquraCalendar[0]);
+    public UmmalquraCalendar[] getDisabledDays() {
+        if (disabledDays.isEmpty()) return null;
+        UmmalquraCalendar[] output = disabledDays.toArray(new UmmalquraCalendar[0]);
+        Arrays.sort(output);
+        return output;
     }
 
     /**
@@ -837,17 +794,6 @@ public class HijriDatePickerDialog extends DialogFragment implements
         for (UmmalquraCalendar disabledDay : disabledDays) trimToMidnight(disabledDay);
         this.disabledDays.addAll(Arrays.asList(disabledDays));
         if (mDayPickerView != null) mDayPickerView.onChange();
-    }
-
-    /**
-     * @return an Array of Calendar objects containing the list of days that are not selectable. null if no restriction is set
-     */
-    @SuppressWarnings("unused")
-    public UmmalquraCalendar[] getDisabledDays() {
-        if (disabledDays.isEmpty()) return null;
-        UmmalquraCalendar[] output = disabledDays.toArray(new UmmalquraCalendar[0]);
-        Arrays.sort(output);
-        return output;
     }
 
     /**
@@ -908,28 +854,6 @@ public class HijriDatePickerDialog extends DialogFragment implements
      */
     public void setVersion(Version version) {
         mVersion = version;
-    }
-
-    /**
-     * Set which timezone the picker should use
-     *
-     * @param timeZone The timezone to use
-     */
-    @SuppressWarnings("unused")
-    public void setTimeZone(TimeZone timeZone) {
-        mTimezone = timeZone;
-        mCalendar.setTimeZone(timeZone);
-        YEAR_FORMAT.setTimeZone(timeZone);
-        MONTH_FORMAT.setTimeZone(timeZone);
-        DAY_FORMAT.setTimeZone(timeZone);
-    }
-
-    public void setLocale(Locale locale) {
-        mLocale = locale;
-        mWeekStart = Calendar.getInstance(mTimezone, mLocale).getFirstDayOfWeek();
-        YEAR_FORMAT = new SimpleDateFormat("yyyy", locale);
-        MONTH_FORMAT = new SimpleDateFormat("MMM", locale);
-        DAY_FORMAT = new SimpleDateFormat("dd", locale);
     }
 
     @SuppressWarnings("unused")
@@ -996,7 +920,6 @@ public class HijriDatePickerDialog extends DialogFragment implements
         for (OnDateChangedListener listener : mListeners) listener.onDateChanged();
     }
 
-
     @Override
     public MonthAdapter.CalendarDay getSelectedDay() {
         return new MonthAdapter.CalendarDay(mCalendar, getTimeZone());
@@ -1024,10 +947,6 @@ public class HijriDatePickerDialog extends DialogFragment implements
         return output;
     }
 
-    public void setMinYear(int minYear) {
-        mMinYear = minYear;
-    }
-
     @Override
     public int getMinYear() {
         if (!selectableDays.isEmpty()) return selectableDays.first().get(UmmalquraCalendar.YEAR);
@@ -1035,8 +954,8 @@ public class HijriDatePickerDialog extends DialogFragment implements
         return mMinDate != null && mMinDate.get(UmmalquraCalendar.YEAR) > mMinYear ? mMinDate.get(UmmalquraCalendar.YEAR) : mMinYear;
     }
 
-    public void setMaxYear(int maxYear) {
-        mMaxYear = maxYear;
+    public void setMinYear(int minYear) {
+        mMinYear = minYear;
     }
 
     @Override
@@ -1044,6 +963,10 @@ public class HijriDatePickerDialog extends DialogFragment implements
         if (!selectableDays.isEmpty()) return selectableDays.last().get(UmmalquraCalendar.YEAR);
         // Ensure no years can be selected outside of the given maximum date
         return mMaxDate != null && mMaxDate.get(UmmalquraCalendar.YEAR) < mMaxYear ? mMaxDate.get(UmmalquraCalendar.YEAR) : mMaxYear;
+    }
+
+    public void setMaxYear(int maxYear) {
+        mMaxYear = maxYear;
     }
 
     /**
@@ -1156,6 +1079,18 @@ public class HijriDatePickerDialog extends DialogFragment implements
         return mWeekStart;
     }
 
+    @SuppressWarnings("unused")
+    public void setFirstDayOfWeek(int startOfWeek) {
+        if (startOfWeek < UmmalquraCalendar.SUNDAY || startOfWeek > UmmalquraCalendar.SATURDAY) {
+            throw new IllegalArgumentException("Value must be between Calendar.SUNDAY and " +
+                    "Calendar.SATURDAY");
+        }
+        mWeekStart = startOfWeek;
+        if (mDayPickerView != null) {
+            mDayPickerView.onChange();
+        }
+    }
+
     @Override
     public void registerOnDateChangedListener(OnDateChangedListener listener) {
         mListeners.add(listener);
@@ -1176,9 +1111,31 @@ public class HijriDatePickerDialog extends DialogFragment implements
         return mTimezone == null ? TimeZone.getDefault() : mTimezone;
     }
 
+    /**
+     * Set which timezone the picker should use
+     *
+     * @param timeZone The timezone to use
+     */
+    @SuppressWarnings("unused")
+    public void setTimeZone(TimeZone timeZone) {
+        mTimezone = timeZone;
+        mCalendar.setTimeZone(timeZone);
+        YEAR_FORMAT.setTimeZone(timeZone);
+        MONTH_FORMAT.setTimeZone(timeZone);
+        DAY_FORMAT.setTimeZone(timeZone);
+    }
+
     @Override
     public Locale getLocale() {
         return mLocale;
+    }
+
+    public void setLocale(Locale locale) {
+        mLocale = locale;
+        mWeekStart = Calendar.getInstance(mTimezone, mLocale).getFirstDayOfWeek();
+        YEAR_FORMAT = new SimpleDateFormat("yyyy", locale);
+        MONTH_FORMAT = new SimpleDateFormat("MMM", locale);
+        DAY_FORMAT = new SimpleDateFormat("dd", locale);
     }
 
     public void notifyOnDateListener() {
@@ -1186,5 +1143,33 @@ public class HijriDatePickerDialog extends DialogFragment implements
             mCallBack.onDateSet(HijriDatePickerDialog.this, mCalendar.get(UmmalquraCalendar.YEAR),
                     mCalendar.get(UmmalquraCalendar.MONTH), mCalendar.get(UmmalquraCalendar.DAY_OF_MONTH));
         }
+    }
+
+    public enum Version {
+        VERSION_1,
+        VERSION_2
+    }
+
+    /**
+     * The callback used to indicate the user is done filling in the date.
+     */
+    public interface OnDateSetListener {
+
+        /**
+         * @param view        The view associated with this listener.
+         * @param year        The year that was set.
+         * @param monthOfYear The month that was set (0-11) for compatibility
+         *                    with {@link UmmalquraCalendar}.
+         * @param dayOfMonth  The day of the month that was set.
+         */
+        void onDateSet(HijriDatePickerDialog view, int year, int monthOfYear, int dayOfMonth);
+    }
+
+    /**
+     * The callback used to notify other date picker components of a change in selected date.
+     */
+    interface OnDateChangedListener {
+
+        void onDateChanged();
     }
 }

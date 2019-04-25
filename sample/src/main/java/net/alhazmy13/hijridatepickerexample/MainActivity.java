@@ -1,13 +1,14 @@
 package net.alhazmy13.hijridatepickerexample;
 
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.support.v13.app.FragmentPagerAdapter;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -19,12 +20,12 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        adapter = new PickerAdapter(getFragmentManager());
-        viewPager = (ViewPager) findViewById(R.id.pager);
+        adapter = new PickerAdapter(getSupportFragmentManager());
+        viewPager = findViewById(R.id.pager);
         viewPager.setAdapter(adapter);
 
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         for(int i=0;i<adapter.getCount();i++) tabLayout.getTabAt(i).setText(adapter.getTitle(i));
     }
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity
         Fragment datePickerFragment;
         Fragment hijriPickerFragment;
 
-        public PickerAdapter(FragmentManager fm) {
+        PickerAdapter(FragmentManager fm) {
             super(fm);
             timePickerFragment = new TimePickerFragment();
             datePickerFragment = new GregorianDatePickerFragment();
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        public int getTitle(int position) {
+        int getTitle(int position) {
             switch(position) {
                 case 0:
                     return R.string.tab_title_time;

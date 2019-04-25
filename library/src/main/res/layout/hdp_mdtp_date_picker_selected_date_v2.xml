@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
      Copyright (C) 2013 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,8 +22,8 @@
     android:layout_weight="1"
     android:background="@color/mdtp_accent_color"
     android:gravity="top"
-    android:padding="16dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <net.alhazmy13.hijridatepicker.AccessibleTextView
         android:id="@+id/mdtp_date_picker_year"
@@ -45,18 +44,19 @@
         android:layout_gravity="center"
         android:clickable="true"
         android:orientation="horizontal"
-        android:textColor="@color/mdtp_date_picker_selector" >
+        android:textColor="@color/mdtp_date_picker_selector">
+
         <TextView
             android:id="@+id/mdtp_date_picker_day"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:duplicateParentState="true"
-            android:gravity="left"
+            android:gravity="start"
             android:includeFontPadding="false"
             android:textColor="@color/mdtp_date_picker_selector"
             android:textSize="@dimen/mdtp_datepicker_selection_text_size"
-            tools:text="Fri, May 15"/>
+            tools:text="Fri, May 15" />
     </net.alhazmy13.hijridatepicker.AccessibleLinearLayout>
 
 </LinearLayout>

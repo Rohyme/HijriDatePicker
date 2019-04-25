@@ -63,6 +63,10 @@ public class YearPickerView extends ListView implements OnItemClickListener, OnD
         onDateChanged();
     }
 
+    private static int getYearFromTextView(TextView view) {
+        return Integer.valueOf(view.getText().toString());
+    }
+
     private void init() {
         mAdapter = new YearAdapter(mController.getMinYear(), mController.getMaxYear());
         setAdapter(mAdapter);
@@ -87,8 +91,42 @@ public class YearPickerView extends ListView implements OnItemClickListener, OnD
         }
     }
 
-    private static int getYearFromTextView(TextView view) {
-        return Integer.valueOf(view.getText().toString());
+    public void postSetSelectionCentered(final int position) {
+        postSetSelectionFromTop(position, mViewSize / 2 - mChildSize / 2);
+    }
+
+    public void postSetSelectionFromTop(final int position, final int offset) {
+        post(new Runnable() {
+
+            @Override
+            public void run() {
+                setSelectionFromTop(position, offset);
+                requestLayout();
+            }
+        });
+    }
+
+    public int getFirstPositionOffset() {
+        final View firstChild = getChildAt(0);
+        if (firstChild == null) {
+            return 0;
+        }
+        return firstChild.getTop();
+    }
+
+    @Override
+    public void onDateChanged() {
+        mAdapter.notifyDataSetChanged();
+        postSetSelectionCentered(mController.getSelectedDay().year - mController.getMinYear());
+    }
+
+    @Override
+    public void onInitializeAccessibilityEvent(AccessibilityEvent event) {
+        super.onInitializeAccessibilityEvent(event);
+        if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
+            event.setFromIndex(0);
+            event.setToIndex(0);
+        }
     }
 
     private final class YearAdapter extends BaseAdapter {
@@ -137,44 +175,6 @@ public class YearPickerView extends ListView implements OnItemClickListener, OnD
                 mSelectedView = v;
             }
             return v;
-        }
-    }
-
-    public void postSetSelectionCentered(final int position) {
-        postSetSelectionFromTop(position, mViewSize / 2 - mChildSize / 2);
-    }
-
-    public void postSetSelectionFromTop(final int position, final int offset) {
-        post(new Runnable() {
-
-            @Override
-            public void run() {
-                setSelectionFromTop(position, offset);
-                requestLayout();
-            }
-        });
-    }
-
-    public int getFirstPositionOffset() {
-        final View firstChild = getChildAt(0);
-        if (firstChild == null) {
-            return 0;
-        }
-        return firstChild.getTop();
-    }
-
-    @Override
-    public void onDateChanged() {
-        mAdapter.notifyDataSetChanged();
-        postSetSelectionCentered(mController.getSelectedDay().year - mController.getMinYear());
-    }
-
-    @Override
-    public void onInitializeAccessibilityEvent(AccessibilityEvent event) {
-        super.onInitializeAccessibilityEvent(event);
-        if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
-            event.setFromIndex(0);
-            event.setToIndex(0);
         }
     }
 }

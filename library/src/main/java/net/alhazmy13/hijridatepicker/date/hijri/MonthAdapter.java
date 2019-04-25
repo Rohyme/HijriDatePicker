@@ -24,6 +24,7 @@ import android.widget.AbsListView.LayoutParams;
 import android.widget.BaseAdapter;
 
 import com.github.msarhan.ummalqura.calendar.UmmalquraCalendar;
+
 import net.alhazmy13.hijridatepicker.date.hijri.MonthView.OnDayClickListener;
 
 import java.util.HashMap;
@@ -35,88 +36,24 @@ import java.util.TimeZone;
  */
 public abstract class MonthAdapter extends BaseAdapter implements OnDayClickListener {
 
+    protected static final int MONTHS_IN_YEAR = 12;
     private static final String TAG = "SimpleMonthAdapter";
-
-    private final Context mContext;
+    protected static int WEEK_7_OVERHANG_HEIGHT = 7;
     protected final DatePickerController mController;
-
+    private final Context mContext;
     private CalendarDay mSelectedDay;
 
-    protected static int WEEK_7_OVERHANG_HEIGHT = 7;
-    protected static final int MONTHS_IN_YEAR = 12;
-
-    /**
-     * A convenience class to represent a specific date.
-     */
-    public static class CalendarDay {
-        private UmmalquraCalendar calendar;
-        int year;
-        int month;
-        int day;
-        TimeZone mTimeZone;
-
-        public CalendarDay(TimeZone timeZone) {
-            mTimeZone = timeZone;
-            setTime(System.currentTimeMillis());
-        }
-
-        public CalendarDay(long timeInMillis, TimeZone timeZone) {
-            mTimeZone = timeZone;
-            setTime(timeInMillis);
-        }
-
-        public CalendarDay(UmmalquraCalendar calendar, TimeZone timeZone) {
-            mTimeZone = timeZone;
-            year = calendar.get(UmmalquraCalendar.YEAR);
-            month = calendar.get(UmmalquraCalendar.MONTH);
-            day = calendar.get(UmmalquraCalendar.DAY_OF_MONTH);
-        }
-
-        public CalendarDay(int year, int month, int day) {
-            setDay(year, month, day);
-        }
-
-        public void set(CalendarDay date) {
-            year = date.year;
-            month = date.month;
-            day = date.day;
-        }
-
-        public void setDay(int year, int month, int day) {
-            this.year = year;
-            this.month = month;
-            this.day = day;
-        }
-
-        private void setTime(long timeInMillis) {
-            if (calendar == null) {
-                calendar = new UmmalquraCalendar(mTimeZone, Locale.getDefault());
-            }
-            calendar.setTimeInMillis(timeInMillis);
-            month = calendar.get(UmmalquraCalendar.MONTH);
-            year = calendar.get(UmmalquraCalendar.YEAR);
-            day = calendar.get(UmmalquraCalendar.DAY_OF_MONTH);
-        }
-
-        public int getYear() {
-            return year;
-        }
-
-        public int getMonth() {
-            return month;
-        }
-
-        public int getDay() {
-            return day;
-        }
-    }
-
     public MonthAdapter(Context context,
-            DatePickerController controller) {
+                        DatePickerController controller) {
         mContext = context;
         mController = controller;
         init();
         setSelectedDay(mController.getSelectedDay());
+    }
+
+    @SuppressWarnings("unused")
+    public CalendarDay getSelectedDay() {
+        return mSelectedDay;
     }
 
     /**
@@ -127,11 +64,6 @@ public abstract class MonthAdapter extends BaseAdapter implements OnDayClickList
     public void setSelectedDay(CalendarDay day) {
         mSelectedDay = day;
         notifyDataSetChanged();
-    }
-
-    @SuppressWarnings("unused")
-    public CalendarDay getSelectedDay() {
-        return mSelectedDay;
     }
 
     /**
@@ -217,7 +149,6 @@ public abstract class MonthAdapter extends BaseAdapter implements OnDayClickList
         return mSelectedDay.year == year && mSelectedDay.month == month;
     }
 
-
     @Override
     public void onDayClick(MonthView view, CalendarDay day) {
         if (day != null) {
@@ -234,5 +165,71 @@ public abstract class MonthAdapter extends BaseAdapter implements OnDayClickList
         mController.tryVibrate();
         mController.onDayOfMonthSelected(day.year, day.month, day.day);
         setSelectedDay(day);
+    }
+
+    /**
+     * A convenience class to represent a specific date.
+     */
+    public static class CalendarDay {
+        int year;
+        int month;
+        int day;
+        TimeZone mTimeZone;
+        private UmmalquraCalendar calendar;
+
+        public CalendarDay(TimeZone timeZone) {
+            mTimeZone = timeZone;
+            setTime(System.currentTimeMillis());
+        }
+
+        public CalendarDay(long timeInMillis, TimeZone timeZone) {
+            mTimeZone = timeZone;
+            setTime(timeInMillis);
+        }
+
+        public CalendarDay(UmmalquraCalendar calendar, TimeZone timeZone) {
+            mTimeZone = timeZone;
+            year = calendar.get(UmmalquraCalendar.YEAR);
+            month = calendar.get(UmmalquraCalendar.MONTH);
+            day = calendar.get(UmmalquraCalendar.DAY_OF_MONTH);
+        }
+
+        public CalendarDay(int year, int month, int day) {
+            setDay(year, month, day);
+        }
+
+        public void set(CalendarDay date) {
+            year = date.year;
+            month = date.month;
+            day = date.day;
+        }
+
+        public void setDay(int year, int month, int day) {
+            this.year = year;
+            this.month = month;
+            this.day = day;
+        }
+
+        private void setTime(long timeInMillis) {
+            if (calendar == null) {
+                calendar = new UmmalquraCalendar(mTimeZone, Locale.getDefault());
+            }
+            calendar.setTimeInMillis(timeInMillis);
+            month = calendar.get(UmmalquraCalendar.MONTH);
+            year = calendar.get(UmmalquraCalendar.YEAR);
+            day = calendar.get(UmmalquraCalendar.DAY_OF_MONTH);
+        }
+
+        public int getYear() {
+            return year;
+        }
+
+        public int getMonth() {
+            return month;
+        }
+
+        public int getDay() {
+            return day;
+        }
     }
 }

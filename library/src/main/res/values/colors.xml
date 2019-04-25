@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
      Copyright (C) 2013 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,7 +40,9 @@
     <color name="mdtp_date_picker_text_normal_dark_theme">@color/mdtp_white</color>
     <color name="mdtp_date_picker_month_day_dark_theme">#b4b4b4</color>
     <color name="mdtp_date_picker_text_disabled_dark_theme">#767676</color>
-    <color name="mdtp_date_picker_text_highlighted_dark_theme">@color/mdtp_date_picker_text_normal_dark_theme</color>
+    <color name="mdtp_date_picker_text_highlighted_dark_theme">
+        @color/mdtp_date_picker_text_normal_dark_theme
+    </color>
 
     <color name="mdtp_calendar_header">@color/mdtp_accent_color_dark</color>
     <color name="mdtp_date_picker_view_animator">@android:color/white</color>
